@@ -9,6 +9,7 @@ const clientRoutes = require('./routes/clients');
 const workflowRoutes = require('./routes/workflows');
 const analyticsRoutes = require('./routes/analytics');
 const contactRoutes = require('./routes/contacts');
+const assistantRoutes = require('./routes/assistant');
 
 const app = express();
 
@@ -17,8 +18,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -38,6 +39,7 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/workflows', workflowRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/assistant', assistantRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

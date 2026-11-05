@@ -1,23 +1,22 @@
 # Halal AI Backend
 
-A comprehensive Node.js/Express API for AI automation, lead management, CRM, workflow automation, and business analytics.
+A Node.js/Express API for AI assistance, lead management, CRM, workflow automation, and business analytics.
 
 ## Features
 
-- User authentication (JWT)
+- JWT user authentication
 - Lead capture and management
 - Client profile management
-- Workflow automation
-- Analytics and reporting
-- Contact form handling
-- MongoDB integration
-- CORS enabled for frontend integration
+- Workflow automation and analytics
+- Authenticated AI assistant endpoints for chat, text summaries, text-to-speech voice-over, and image generation
+- MongoDB integration and CORS support
 
 ## Setup
 
 ### Prerequisites
 - Node.js (v14+)
 - MongoDB (local or Atlas)
+- An API key for an OpenAI-compatible AI provider (needed for assistant endpoints)
 
 ### Installation
 
@@ -25,104 +24,76 @@ A comprehensive Node.js/Express API for AI automation, lead management, CRM, wor
 git clone https://github.com/biihafidh/fluxa-ai-backend.git
 cd fluxa-ai-backend
 npm install
-```
-
-### Environment Variables
-
-Create a `.env` file based on `.env.example`:
-
-```bash
 cp .env.example .env
 ```
 
-Update with your configuration:
-- `MONGODB_URI`: Your MongoDB connection string
-- `JWT_SECRET`: A secure random string
-- `FRONTEND_URL`: Frontend application URL
-- `PORT`: Server port (default: 5000)
+Set `MONGODB_URI`, a strong `JWT_SECRET`, `FRONTEND_URL`, and `AI_API_KEY` in `.env`. Optionally configure `AI_BASE_URL`, `AI_CHAT_MODEL`, `AI_IMAGE_MODEL`, `AI_TTS_MODEL`, and `AI_TTS_VOICE` for your provider. Keep the provider key on the server; never expose it in frontend code.
 
-### Running the Server
+### Run
 
-**Development:**
 ```bash
 npm run dev
-```
-
-**Production:**
-```bash
+# or
 npm start
 ```
 
-## API Endpoints
+## API
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user
-- `POST /api/auth/logout` - Logout user
+Every `/api/assistant` endpoint requires `Authorization: Bearer <JWT>` from the existing login/register endpoints. Requests are JSON unless specified.
 
-### Leads
-- `GET /api/leads/:clientId` - Get all leads
-- `POST /api/leads` - Create new lead
-- `GET /api/leads/detail/:id` - Get lead details
-- `PUT /api/leads/:id` - Update lead
-- `POST /api/leads/:id/score` - Score a lead
+### Chat
 
-### Clients
-- `GET /api/clients/profile/:userId` - Get client profile
-- `POST /api/clients` - Create client profile
-- `PUT /api/clients/:id` - Update client profile
-- `GET /api/clients/dashboard/:clientId` - Get dashboard data
+`POST /api/assistant/chat`
 
-### Workflows
-- `GET /api/workflows/:clientId` - Get all workflows
-- `POST /api/workflows` - Create workflow
-- `POST /api/workflows/:id/activate` - Activate workflow
-- `POST /api/workflows/:id/pause` - Pause workflow
+```json
+{
+  "messages": [
+    { "role": "user", "content": "Help me plan my day" }
+  ]
+}
+```
 
-### Analytics
-- `GET /api/analytics/leads/:clientId` - Lead analytics
-- `GET /api/analytics/workflows/:clientId` - Workflow analytics
+Returns `{ "reply": "...", "usage": { ... } }`. Up to 20 user/assistant messages are accepted; each is limited to 8,000 characters.
 
-### Contacts
-- `POST /api/contacts` - Submit contact form
-- `GET /api/contacts` - Get all contacts
+### Summaries
 
-### Health Check
-- `GET /api/health` - API health status
+`POST /api/assistant/summarize`
 
-## Database Models
+```json
+{ "text": "Text to summarize", "style": "concise" }
+```
 
-### User
-- Email, password (hashed), name, company, role, status
+Returns `{ "summary": "...", "usage": { ... } }`.
 
-### Lead
-- Contact info, status, score, source, tags, custom fields
+### Voice-over (text to speech)
 
-### Client
-- Business info, plan, automation status, metrics
+`POST /api/assistant/voice`
 
-### Workflow
-- Name, type, trigger, steps, status, performance metrics
+```json
+{ "text": "Welcome to Halal AI", "voice": "alloy" }
+```
 
-### Contact
-- Form submission data from website
+Returns `audio/mpeg` bytes that can be played as an MP3. Text is limited to 4,000 characters. Configure voice/model options for your provider.
 
-## Integration with Frontend
+### Image generation
 
-The frontend should:
-1. Register/login users
-2. Store JWT token in localStorage
-3. Include token in Authorization header: `Bearer <token>`
-4. Call endpoints with appropriate clientId
+`POST /api/assistant/image`
 
-## Deployment
+```json
+{ "prompt": "A calm geometric pattern in teal and gold", "size": "1024x1024" }
+```
 
-Recommended platforms:
-- Heroku
-- AWS EC2
-- DigitalOcean
-- Railway.app
+Returns `{ "image": { "url": "..." }, "revisedPrompt": null }` or base64 image data if the provider returns it that way. Allowed sizes: `1024x1024`, `1024x1536`, `1536x1024`.
+
+### Existing endpoints
+
+- `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`
+- `/api/leads`, `/api/clients`, `/api/workflows`, `/api/analytics`, `/api/contacts`
+- `GET /api/health`
+
+## Notes
+
+The assistant sends only the supplied messages/text/prompts to the configured AI provider; it does not automatically access CRM records or persist chat history. Provider usage may incur charges and follows the provider's data policies. Review generated content before relying on it, especially for religious, legal, medical, or financial decisions.
 
 ## License
 
