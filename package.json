@@ -1,7 +1,7 @@
 {
-  "name": "fluxa-ai-backend",
+  "name": "halal-ai-backend",
   "version": "1.0.0",
-  "description": "Fluxa AI Backend - Lead management, CRM, automation workflows, and analytics API",
+  "description": "Halal AI Backend - Lead management, CRM, automation workflows, and analytics API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,7 +9,7 @@
     "test": "jest --coverage"
   },
   "keywords": ["AI", "automation", "CRM", "leads"],
-  "author": "Fluxa AI",
+  "author": "Halal AI",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",

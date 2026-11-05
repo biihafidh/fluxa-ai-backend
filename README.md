@@ -1,4 +1,4 @@
-# Fluxa AI Backend
+# Halal AI Backend
 
 A comprehensive Node.js/Express API for AI automation, lead management, CRM, workflow automation, and business analytics.
 
